@@ -62,14 +62,81 @@ mvn clean test
 
 ---
 
-## 🏗 Arquitetura e Decisões Técnicas
+## 🏗 Arquitetura e Decisões Técnicas (Clean Architecture Padrão CAIXA)
 
-O projeto foi organizado em camadas concêntricas (Clean Architecture) priorizando a independência do framework:
+Para se alinhar à padronização e excelência técnica das aplicações já desenvolvidas na **CAIXA**, este projeto foi construído utilizando a **Clean Architecture** (Arquitetura Limpa), impulsionada pelas tecnologias **Java (Quarkus)** e **Hibernate com Panache**.
 
-- `domain`: O coração do negócio (Modelos nativos, Value Objects como `ResultadoSimulacao`, Exceptions de domínio). Sem anotações de Quarkus ou Banco de Dados.
-- `application`: Casos de Uso (`CriarSimulacaoUseCase`, `BuscarHistoricoUseCase`). Orquestra a lógica de negócio usando interfaces.
-- `infrastructure`: Onde a magia da tecnologia acontece (Banco de Dados SQLite, Implementações de Repositórios com Panache, Mappers com MapStruct, Migrations com Flyway).
-- `presentation`: A borda da aplicação (Controllers que recebem as requisições REST, DTOs de Request/Response, Exception Mappers globais).
+Essa escolha arquitetural garante os seguintes benefícios corporativos:
+- **Intocabilidade da Regra de Negócio (Domain):** As regras vitais de negócio (como os cálculos de rentabilidade das simulações) ficam totalmente independentes do framework (Quarkus) ou do ecossistema de dados externo.
+- **Inversão de Dependência:** O acesso ao banco de dados utilizando *Hibernate Panache* via padrão Repository, assim como a disponibilização de endpoints web, operam isolados nas margens da aplicação (`Infrastructure` e `Presentation`). O domínio dita as regras por meio de contratos (interfaces).
+- **Testabilidade Aprimorada:** Casos de uso (`Application`) e lógicas de domínio podem ser testados unitariamente de forma rápida e eficiente, sem o peso de inicialização de conexões com banco de dados ou do container corporativo.
+
+Abaixo está o gráfico da estrutura de pastas representando as 4 camadas fundamentais do projeto:
+
+```text
+src/main/java/gov/caixa/
+├── application/         # Casos de uso que orquestram os fluxos (Application Business Rules)
+│   └── usecase/
+├── domain/              # Núcleo inalterável (Enterprise Business Rules)
+│   ├── exception/
+│   ├── model/           # Entidades centrais (Produto, Simulacao)
+│   ├── repository/      # Contratos (Interfaces)
+│   └── valueobject/
+├── infrastructure/      # Motores de persistência e implementações técnicas (Frameworks & Drivers)
+│   └── persistence/
+│       ├── converter/
+│       ├── entity/      # Entidades JPA
+│       ├── mapper/      # MapStruct (Entity <-> Domain)
+│       └── repository/  # PanacheRepository implementando os contratos do Domain
+└── presentation/        # Controladores REST e entrada de requisições (Interface Adapters)
+    ├── controller/      # RESTEasy
+    ├── dto/             # Objetos de transferência de dados (Request/Response)
+    └── exception/       # Exception Mappers globais
+```
+
+### 🔄 Fluxos da Aplicação (Diagramas de Sequência)
+
+Para facilitar o entendimento de como as camadas se comunicam, abaixo estão os fluxos das duas principais funcionalidades da API:
+
+#### 1. Criar Simulação (`POST /simulacoes`)
+
+```mermaid
+sequenceDiagram
+    actor Cliente
+    participant Controller as Presentation (REST)
+    participant UseCase as Application (UseCase)
+    participant Domain as Domain (Models)
+    participant Repository as Infrastructure (Panache)
+    
+    Cliente->>Controller: POST /simulacoes (JSON)
+    Controller->>UseCase: executar(criarSimulacaoCmd)
+    UseCase->>Repository: buscarProdutosElegiveis(prazo, valorAplicado)
+    Repository-->>UseCase: Lista<Produto>
+    UseCase->>Domain: Validar produto adequado e Calcular Rendimento
+    Domain-->>UseCase: resultadoCalculo
+    UseCase->>Domain: new Simulacao(dados, resultado, produto)
+    UseCase->>Repository: salvar(Simulacao)
+    Repository-->>UseCase: Simulacao Salva
+    UseCase-->>Controller: SimulacaoDTO
+    Controller-->>Cliente: 201 Created (JSON Response)
+```
+
+#### 2. Buscar Histórico (`GET /simulacoes?clienteId={id}`)
+
+```mermaid
+sequenceDiagram
+    actor Cliente
+    participant Controller as Presentation (REST)
+    participant UseCase as Application (UseCase)
+    participant Repository as Infrastructure (Panache)
+    
+    Cliente->>Controller: GET /simulacoes?clienteId=123
+    Controller->>UseCase: executar(clienteId)
+    UseCase->>Repository: buscarSimulacoesPorCliente(clienteId)
+    Repository-->>UseCase: Lista<Simulacao>
+    UseCase-->>Controller: Lista<SimulacaoDTO>
+    Controller-->>Cliente: 200 OK (Array JSON)
+```
 
 ## ✨ Extras (Bônus Implementados)
 
