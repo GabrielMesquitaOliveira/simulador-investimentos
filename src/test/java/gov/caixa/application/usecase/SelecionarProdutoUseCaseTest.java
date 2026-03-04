@@ -1,4 +1,4 @@
-package gov.caixa.domain.service;
+package gov.caixa.application.usecase;
 
 import gov.caixa.domain.exception.ProdutoNaoElegivelException;
 import gov.caixa.domain.model.Produto;
@@ -12,15 +12,15 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class ProdutoSelectorServiceTest {
+class SelecionarProdutoUseCaseTest {
 
     private ProdutoRepository produtoRepository;
-    private ProdutoSelectorService sut;
+    private SelecionarProdutoUseCase sut;
 
     @BeforeEach
     void setUp() {
         produtoRepository = mock(ProdutoRepository.class);
-        sut = new ProdutoSelectorService(produtoRepository);
+        sut = new SelecionarProdutoUseCase(produtoRepository);
     }
 
     @Test
@@ -34,7 +34,7 @@ class ProdutoSelectorServiceTest {
                 .thenReturn(Optional.of(produto));
 
         // Act
-        Produto resultado = sut.selecionar("CDB", new BigDecimal("10000.00"), 12);
+        Produto resultado = sut.executar("CDB", new BigDecimal("10000.00"), 12);
 
         // Assert
         assertNotNull(resultado);
@@ -51,7 +51,7 @@ class ProdutoSelectorServiceTest {
         // Act & Assert
         ProdutoNaoElegivelException ex = assertThrows(
                 ProdutoNaoElegivelException.class,
-                () -> sut.selecionar("LCI", new BigDecimal("500.00"), 3));
+                () -> sut.executar("LCI", new BigDecimal("500.00"), 3));
 
         assertTrue(ex.getMessage().contains("LCI"));
         assertTrue(ex.getMessage().contains("3 meses"));
