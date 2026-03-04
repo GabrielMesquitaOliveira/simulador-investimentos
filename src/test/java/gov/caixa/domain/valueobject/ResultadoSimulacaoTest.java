@@ -40,4 +40,16 @@ class ResultadoSimulacaoTest {
         // Assert
         assertEquals(0, new BigDecimal("5000.00").compareTo(resultado.valorFinal()));
     }
+
+    @Test
+    void deveValidarMetodosDeRecord() {
+        ResultadoSimulacao r1 = new ResultadoSimulacao(new BigDecimal("100"), 12, new BigDecimal("0.1"));
+        ResultadoSimulacao r2 = new ResultadoSimulacao(new BigDecimal("100"), 12, new BigDecimal("0.1"));
+        ResultadoSimulacao r3 = new ResultadoSimulacao(new BigDecimal("200"), 12, new BigDecimal("0.1"));
+
+        assertEquals(r1, r2);
+        assertNotEquals(r1, r3);
+        assertEquals(r1.hashCode(), r2.hashCode());
+        assertNotNull(r1.toString());
+    }
 }

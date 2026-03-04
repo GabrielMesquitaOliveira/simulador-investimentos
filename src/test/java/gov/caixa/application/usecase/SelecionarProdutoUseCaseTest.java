@@ -11,7 +11,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import io.quarkus.test.junit.QuarkusTest;
 
+@QuarkusTest
 class SelecionarProdutoUseCaseTest {
 
     private ProdutoRepository produtoRepository;

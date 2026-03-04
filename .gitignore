@@ -46,3 +46,4 @@ nb-configuration.xml
 
 # Antigravity
 .agent/
+:memory:?cache=shared
