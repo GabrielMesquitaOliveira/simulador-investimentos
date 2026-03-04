@@ -92,4 +92,23 @@ class SimulacaoControllerIT {
                 .body("$", not(empty()))
                 .body("[0].clienteId", equalTo(123));
     }
+
+    @Test
+    void getResumo_deveRetornar200ComAgregacao() {
+        // Create a simulation first
+        given().contentType(ContentType.JSON).body(VALID_PAYLOAD)
+                .post("/simulacoes");
+
+        given()
+                .queryParam("clienteId", 123)
+                .when()
+                .get("/simulacoes/resumo")
+                .then()
+                .statusCode(200)
+                .body("totalSimulacoes", greaterThanOrEqualTo(1))
+                .body("totalInvestido", greaterThan(0f))
+                .body("totalProjetado", greaterThan(0f))
+                .body("ganhoProjetado", greaterThan(0f))
+                .body("rentabilidadeMediaAnual", greaterThan(0f));
+    }
 }

@@ -50,17 +50,28 @@ curl -X POST http://localhost:8080/simulacoes \
 curl -X GET "http://localhost:8080/simulacoes?clienteId=12345"
 ```
 
+### 3. Agregação de Resultados (GET) - Bônus
+
+Este endpoint foi criado como um diferencial. Ele agrega todas as simulações de um cliente e fornece métricas valiosas como o valor médio aplicado, total rendido e contagem por produto.
+
+```bash
+curl -X GET "http://localhost:8080/simulacoes/resumo?clienteId=12345"
+```
 ---
 
 ## 🧪 Como Rodar os Testes Automatizados (Opcional)
 
-A cobertura de testes do projeto já ultrapassa os **80%** exigidos (alcançando ~90%). 
+A cobertura de testes do projeto já ultrapassa os **80%** exigidos (alcançando **100%** nas regras de negócio e domain), possuindo **29 testes automatizados**.
 
-Caso você tenha **Java 21 e Maven** instalados na sua máquina e deseje rodar os testes localmente para validar a cobertura e as asserções:
+Caso você tenha **Java 21 e Quarkus CLI** (ou Maven) instalados na sua máquina, recomenda-se rodar a suíte inteira de testes através da CLI nativa do Quarkus, o que garante a resolução correta das injeções de dependência (CDI) atreladas ao MapStruct. Utilize o comando:
 
 ```bash
-mvn clean test
+quarkus test
 ```
+
+*(Alternativamente, com Maven: `mvn quarkus:test`)*
+
+Você também pode utilizar a interface gráfica e o *Continuous Testing* do Quarkus. Para isso, inicie o projeto em modo de desenvolvimento (`quarkus dev` ou `mvn quarkus:dev`), pressione `r` no terminal para rodar a suíte, ou acesse a Dev UI pelo navegador em `http://localhost:8080/q/dev-ui/` e interaja com os testes via interface gráfica.
 
 ---
 
@@ -142,9 +153,12 @@ sequenceDiagram
 
 ## ✨ Extras (Bônus Implementados)
 
-Conforme sugerido no desafio, adicionei:
-- **Dockerfile** simplificado multi-stage na raiz do repositório.
-- **Docker Compose** para 1-click run.
-- Histórico completo no Git refletindo as camadas do desenvolvimento.
+Conforme sugerido no desafio, adicionei diversos bônus que valorizam a aplicação corporativa:
+- **Endpoint adicional de Agregação:** Rota (`GET /simulacoes/resumo`) que retorna analíticas do cliente combinando arquitetura limpa com Value Objects matemáticos puros.
+- **Integração Perfeita Quarkus Arc CDI + MapStruct:** Execução otimizada de mappers nativamente, aproveitando o *Continuous Testing* interativo com a Dev UI do Quarkus.
+- **Dockerfile** simplificado multi-stage na raiz do repositório para compilação isolada sem depender no Host.
+- **Docker Compose** para 1-click run com banco de dados em memória e volumes pré-configurados.
+- **Clean Architecture Completa:** Casos de uso (`BuscarResumoUseCase`, `CriarSimulacaoUseCase`) perfeitamente desacoplados de bibliotecas REST ou Panache JPA, isolando a API e o banco.
+- Histórico completo no Git refletindo as camadas do desenvolvimento e refatorações complexas.
 
 Se chegou até aqui, muito obrigado por avaliar meu código!

@@ -1,8 +1,10 @@
 package gov.caixa.presentation.controller;
 
 import gov.caixa.application.usecase.BuscarHistoricoUseCase;
+import gov.caixa.application.usecase.BuscarResumoUseCase;
 import gov.caixa.application.usecase.CriarSimulacaoUseCase;
 import gov.caixa.presentation.dto.HistoricoItemResponse;
+import gov.caixa.presentation.dto.ResumoResponse;
 import gov.caixa.presentation.dto.SimulacaoRequest;
 import gov.caixa.presentation.dto.SimulacaoResponse;
 import jakarta.transaction.Transactional;
@@ -20,11 +22,14 @@ public class SimulacaoController {
 
     private final CriarSimulacaoUseCase criarSimulacaoUseCase;
     private final BuscarHistoricoUseCase buscarHistoricoUseCase;
+    private final BuscarResumoUseCase buscarResumoUseCase;
 
     public SimulacaoController(CriarSimulacaoUseCase criarSimulacaoUseCase,
-            BuscarHistoricoUseCase buscarHistoricoUseCase) {
+            BuscarHistoricoUseCase buscarHistoricoUseCase,
+            BuscarResumoUseCase buscarResumoUseCase) {
         this.criarSimulacaoUseCase = criarSimulacaoUseCase;
         this.buscarHistoricoUseCase = buscarHistoricoUseCase;
+        this.buscarResumoUseCase = buscarResumoUseCase;
     }
 
     @POST
@@ -45,5 +50,11 @@ public class SimulacaoController {
                 .stream()
                 .map(HistoricoItemResponse::from)
                 .toList();
+    }
+
+    @GET
+    @Path("/resumo")
+    public ResumoResponse resumo(@QueryParam("clienteId") Long clienteId) {
+        return ResumoResponse.from(buscarResumoUseCase.executar(clienteId));
     }
 }
