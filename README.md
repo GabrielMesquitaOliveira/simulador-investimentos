@@ -1,62 +1,81 @@
-# simulador-investimentos
+# Simulador de Investimentos - CAIXA
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Este é o projeto para o Desafio Técnico Back-end da CAIXA, construído seguindo os padrões da **Clean Architecture**, além de contar com a stack **Java 21 + Quarkus + SQLite**.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+> 💡 **Para o Avaliador:** O projeto foi configurado com Docker para poupar o seu tempo. Você **não precisa** ter Java, Maven ou SQLite instalados em sua máquina para rodar ou testar o projeto. **Basta ter o Docker!**
 
-## Running the application in dev mode
+---
 
-You can run your application in dev mode that enables live coding using:
+## 🚀 Como Rodar o Projeto (A Forma Mais Fácil)
 
-```shell script
-./mvnw quarkus:dev
+O projeto possui um `Dockerfile` multi-stage que compila o código fonte e gera a imagem de execução de forma totalmente isolada.
+
+Abra seu terminal na raiz do projeto e execute:
+
+```bash
+docker compose up --build
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+*(Ou `docker-compose up --build` dependendo da sua versão do Docker).*
 
-## Packaging and running the application
+Pronto! A API estará rodando em `http://localhost:8080`.
+*(Na primeira vez pode levar alguns minutos para o Docker baixar as camadas do Maven e compilar).*
 
-The application can be packaged using:
+---
 
-```shell script
-./mvnw package
+## 💻 Testando a API (Copiar e Colar)
+
+Abra outro terminal e rode os `curl` abaixo para validar imediatamente o sistema:
+
+### 1. Criar uma Simulação (POST)
+
+```bash
+curl -X POST http://localhost:8080/simulacoes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "clienteId": 12345,
+    "valor": 10000.00,
+    "prazoMeses": 12,
+    "tipoProduto": "CDB"
+  }'
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+*Obs: A tabela de produtos é populada automaticamente com opções de `CDB`, `LCA` e `LCI` no momento em que a aplicação sobe (Migration via Flyway).*
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+### 2. Buscar o Histórico de Simulações (GET)
 
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+```bash
+curl -X GET "http://localhost:8080/simulacoes?clienteId=12345"
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+---
 
-## Creating a native executable
+## 🧪 Como Rodar os Testes Automatizados (Opcional)
 
-You can create a native executable using:
+A cobertura de testes do projeto já ultrapassa os **80%** exigidos (alcançando ~90%). 
 
-```shell script
-./mvnw package -Dnative
+Caso você tenha **Java 21 e Maven** instalados na sua máquina e deseje rodar os testes localmente para validar a cobertura e as asserções:
+
+```bash
+mvn clean test
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+---
 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
+## 🏗 Arquitetura e Decisões Técnicas
 
-You can then execute your native executable with: `./target/simulador-investimentos-1.0.0-SNAPSHOT-runner`
+O projeto foi organizado em camadas concêntricas (Clean Architecture) priorizando a independência do framework:
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
+- `domain`: O coração do negócio (Modelos nativos, Value Objects como `ResultadoSimulacao`, Exceptions de domínio). Sem anotações de Quarkus ou Banco de Dados.
+- `application`: Casos de Uso (`CriarSimulacaoUseCase`, `BuscarHistoricoUseCase`). Orquestra a lógica de negócio usando interfaces.
+- `infrastructure`: Onde a magia da tecnologia acontece (Banco de Dados SQLite, Implementações de Repositórios com Panache, Mappers com MapStruct, Migrations com Flyway).
+- `presentation`: A borda da aplicação (Controllers que recebem as requisições REST, DTOs de Request/Response, Exception Mappers globais).
 
-## Provided Code
+## ✨ Extras (Bônus Implementados)
 
-### REST
+Conforme sugerido no desafio, adicionei:
+- **Dockerfile** simplificado multi-stage na raiz do repositório.
+- **Docker Compose** para 1-click run.
+- Histórico completo no Git refletindo as camadas do desenvolvimento.
 
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+Se chegou até aqui, muito obrigado por avaliar meu código!

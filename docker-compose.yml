@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: simulador-investimentos-api
+    ports:
+      - "8080:8080"
+    environment:
+      - QUARKUS_PROFILE=prod
+    restart: unless-stopped
