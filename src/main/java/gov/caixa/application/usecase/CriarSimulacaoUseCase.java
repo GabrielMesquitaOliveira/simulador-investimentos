@@ -1,5 +1,6 @@
 package gov.caixa.application.usecase;
 
+import gov.caixa.domain.model.Produto;
 import gov.caixa.domain.model.Simulacao;
 import gov.caixa.domain.repository.SimulacaoRepository;
 import gov.caixa.domain.valueobject.ResultadoSimulacao;
@@ -11,6 +12,9 @@ import java.time.Instant;
 @ApplicationScoped
 public class CriarSimulacaoUseCase {
 
+    public record Resultado(Simulacao simulacao, Produto produto) {
+    }
+
     private final SelecionarProdutoUseCase selecionarProdutoUseCase;
     private final SimulacaoRepository simulacaoRepository;
 
@@ -20,7 +24,7 @@ public class CriarSimulacaoUseCase {
         this.simulacaoRepository = simulacaoRepository;
     }
 
-    public Simulacao executar(Long clienteId, BigDecimal valor, int prazoMeses, String tipoProduto) {
+    public Resultado executar(Long clienteId, BigDecimal valor, int prazoMeses, String tipoProduto) {
         var produto = selecionarProdutoUseCase.executar(tipoProduto, valor, prazoMeses);
         var resultado = ResultadoSimulacao.calcular(valor, prazoMeses, produto.rentabilidadeAnual());
 
@@ -35,6 +39,6 @@ public class CriarSimulacaoUseCase {
                 resultado.valorFinal(),
                 Instant.now());
 
-        return simulacaoRepository.salvar(simulacao);
+        return new Resultado(simulacaoRepository.salvar(simulacao), produto);
     }
 }

@@ -46,14 +46,15 @@ class CriarSimulacaoUseCaseTest {
                                 .thenReturn(simulacaoSalva);
 
                 // Act
-                Simulacao resultado = sut.executar(123L, new BigDecimal("10000.00"), 12, "CDB");
+                CriarSimulacaoUseCase.Resultado resultado = sut.executar(123L, new BigDecimal("10000.00"), 12, "CDB");
 
                 // Assert
                 assertNotNull(resultado);
-                assertEquals(42L, resultado.id());
-                assertEquals(123L, resultado.clienteId());
-                assertEquals("CDB Caixa 2026", resultado.produtoNome());
-                assertTrue(resultado.valorFinal().compareTo(BigDecimal.ZERO) > 0);
+                assertNotNull(resultado.produto());
+                assertEquals(42L, resultado.simulacao().id());
+                assertEquals(123L, resultado.simulacao().clienteId());
+                assertEquals("CDB Caixa 2026", resultado.simulacao().produtoNome());
+                assertTrue(resultado.simulacao().valorFinal().compareTo(BigDecimal.ZERO) > 0);
 
                 verify(selecionarProdutoUseCase).executar("CDB", new BigDecimal("10000.00"), 12);
                 verify(simulacaoRepository).salvar(any(Simulacao.class));

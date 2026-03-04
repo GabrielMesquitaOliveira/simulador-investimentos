@@ -2,6 +2,8 @@
 
 Este é o projeto para o Desafio Técnico Back-end da CAIXA, construído seguindo os padrões da **Clean Architecture**, além de contar com a stack **Java 21 + Quarkus + SQLite**.
 
+Disponível no GitHub: https://github.com/GabrielMesquitaOliveira/simulador-investimentos
+
 > 💡 **Para o Avaliador:** O projeto foi configurado com Docker para poupar o seu tempo. Você **não precisa** ter Java, Maven ou SQLite instalados em sua máquina para rodar ou testar o projeto. **Basta ter o Docker!**
 
 ---

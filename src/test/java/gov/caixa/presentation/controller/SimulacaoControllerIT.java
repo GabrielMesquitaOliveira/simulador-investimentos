@@ -28,7 +28,9 @@ class SimulacaoControllerIT {
                 .post("/simulacoes")
                 .then()
                 .statusCode(200)
+                .body("produtoValidado.id", notNullValue())
                 .body("produtoValidado.nome", not(emptyOrNullString()))
+                .body("produtoValidado.risco", not(emptyOrNullString()))
                 .body("resultadoSimulacao.valorFinal", greaterThan(10000.0f))
                 .body("resultadoSimulacao.prazoMeses", equalTo(12))
                 .body("dataSimulacao", not(emptyOrNullString()));

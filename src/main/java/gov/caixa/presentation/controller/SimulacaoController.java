@@ -30,13 +30,13 @@ public class SimulacaoController {
     @POST
     @Transactional
     public Response criar(@Valid SimulacaoRequest request) {
-        var simulacao = criarSimulacaoUseCase.executar(
+        var resultado = criarSimulacaoUseCase.executar(
                 request.clienteId(),
                 request.valor(),
                 request.prazoMeses(),
                 request.tipoProduto());
 
-        return Response.ok(SimulacaoResponse.from(simulacao)).build();
+        return Response.ok(SimulacaoResponse.from(resultado.simulacao(), resultado.produto())).build();
     }
 
     @GET
